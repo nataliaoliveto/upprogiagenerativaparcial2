@@ -11,26 +11,7 @@ import { InputBar } from "./components/InputBar";
 import { MovieCardNode, type MovieNodeData } from "./components/MovieCardNode";
 import { WatchlistSidebar } from "./components/WatchlistSidebar";
 import { useWatchlist } from "./hooks/useWatchlist";
-
-export interface GraphMovie {
-  id: string;
-  title: string;
-  poster: string;
-  description?: string;
-  genres?: string[];
-}
-
-interface GraphEdge {
-  id: string;
-  source: string;
-  target: string;
-  label?: string;
-}
-
-interface GraphData {
-  nodes: GraphMovie[];
-  edges: GraphEdge[];
-}
+import type { GraphData, GraphMovie } from "./data/interfaces";
 
 export default function App() {
   const [graphNodes, setGraphNodes] = useState<Node<MovieNodeData>[]>([]);
@@ -99,47 +80,94 @@ export default function App() {
             childrenMap.get(edge.source)!.push(edge.target);
           });
 
-          const targets = new Set(data.edges.map((e) => e.target));
-          const rootNodes = data.nodes.filter((n) => !targets.has(n.id));
-          const startNodes = rootNodes.length > 0 ? rootNodes : [data.nodes[0]];
-
-          const nodeDepths = new Map<string, number>();
-          const queue = startNodes.map((r) => ({ id: r.id, depth: 0 }));
-
-          while (queue.length > 0) {
-            const curr = queue.shift()!;
-            if (!nodeDepths.has(curr.id)) {
-              nodeDepths.set(curr.id, curr.depth);
-              const children = childrenMap.get(curr.id) || [];
-              children.forEach((c) =>
-                queue.push({ id: c, depth: curr.depth + 1 }),
-              );
-            }
+          const targets = new Set(data.edges.map((edge) => edge.target));
+          const layoutRoots = data.nodes.filter((node) => !targets.has(node.id));
+          if (layoutRoots.length === 0 && data.nodes.length > 0) {
+            layoutRoots.push(data.nodes[0]);
           }
 
-          const nodesByDepth = new Map<number, GraphMovie[]>();
-          data.nodes.forEach((n) => {
-            const depth = nodeDepths.get(n.id) || 0;
-            if (!nodesByDepth.has(depth)) nodesByDepth.set(depth, []);
-            nodesByDepth.get(depth)!.push(n);
+          const rootByNode = new Map<string, string>();
+          const nodeDepths = new Map<string, number>();
+          const assignReachableNodes = (rootId: string) => {
+            const queue = [{ id: rootId, depth: 0 }];
+            while (queue.length > 0) {
+              const current = queue.shift()!;
+              if (rootByNode.has(current.id)) continue;
+
+              rootByNode.set(current.id, rootId);
+              nodeDepths.set(current.id, current.depth);
+              (childrenMap.get(current.id) ?? []).forEach((childId) => {
+                queue.push({ id: childId, depth: current.depth + 1 });
+              });
+            }
+          };
+
+          layoutRoots.forEach((root) => assignReachableNodes(root.id));
+          data.nodes.forEach((node) => {
+            if (rootByNode.has(node.id)) return;
+            layoutRoots.push(node);
+            assignReachableNodes(node.id);
           });
 
           const NODE_WIDTH = 310;
           const NODE_GAP_X = 120;
+          const ROOT_GAP_X = 280;
           const LEVEL_HEIGHT = 660;
           const layoutCenterX = window.innerWidth / 2;
 
+          const nodesByRootAndDepth = new Map<
+            string,
+            Map<number, GraphMovie[]>
+          >();
+          data.nodes.forEach((node) => {
+            const rootId = rootByNode.get(node.id)!;
+            const depth = nodeDepths.get(node.id) ?? 0;
+            let nodesByDepth = nodesByRootAndDepth.get(rootId);
+            if (!nodesByDepth) {
+              nodesByDepth = new Map();
+              nodesByRootAndDepth.set(rootId, nodesByDepth);
+            }
+            const nodesAtDepth = nodesByDepth.get(depth) ?? [];
+            nodesAtDepth.push(node);
+            nodesByDepth.set(depth, nodesAtDepth);
+          });
+
+          const rootGroupWidths = layoutRoots.map((root) => {
+            const nodesByDepth = nodesByRootAndDepth.get(root.id)!;
+            const widestLevel = Math.max(
+              ...Array.from(nodesByDepth.values(), (nodesAtDepth) =>
+                nodesAtDepth.length * NODE_WIDTH +
+                Math.max(0, nodesAtDepth.length - 1) * NODE_GAP_X,
+              ),
+            );
+            return { rootId: root.id, width: widestLevel };
+          });
+          const totalLayoutWidth =
+            rootGroupWidths.reduce((total, group) => total + group.width, 0) +
+            Math.max(0, rootGroupWidths.length - 1) * ROOT_GAP_X;
+          let nextGroupLeft = layoutCenterX - totalLayoutWidth / 2;
+          const rootGroupLefts = new Map<string, number>();
+          rootGroupWidths.forEach((group) => {
+            rootGroupLefts.set(group.rootId, nextGroupLeft);
+            nextGroupLeft += group.width + ROOT_GAP_X;
+          });
+
           const mappedNodes: Node<MovieNodeData>[] = data.nodes.map((movie) => {
+            const rootId = rootByNode.get(movie.id)!;
             const depth = nodeDepths.get(movie.id) || 0;
+            const nodesByDepth = nodesByRootAndDepth.get(rootId)!;
             const levelNodes = nodesByDepth.get(depth)!;
             const indexInLevel = levelNodes.findIndex((n) => n.id === movie.id);
-
-            const totalWidth =
+            const levelWidth =
               levelNodes.length * NODE_WIDTH +
               Math.max(0, levelNodes.length - 1) * NODE_GAP_X;
-            const startX = layoutCenterX - totalWidth / 2;
-
-            const x = startX + indexInLevel * (NODE_WIDTH + NODE_GAP_X);
+            const groupWidth = rootGroupWidths.find(
+              (group) => group.rootId === rootId,
+            )!.width;
+            const x =
+              rootGroupLefts.get(rootId)! +
+              (groupWidth - levelWidth) / 2 +
+              indexInLevel * (NODE_WIDTH + NODE_GAP_X);
             const y = 20 + depth * LEVEL_HEIGHT;
 
             const hasChildren = (childrenMap.get(movie.id)?.length || 0) > 0;
@@ -281,7 +309,9 @@ export default function App() {
           </p>
         </main>
       ) : (
-        <main style={{ position: "relative", flex: 1, minHeight: 0, width: "100%" }}>
+        <main
+          style={{ position: "relative", flex: 1, minHeight: 0, width: "100%" }}
+        >
           <ReactFlow
             nodes={graphNodes}
             edges={movieEdges}

@@ -9,5 +9,27 @@
       "Comedia"
     ],
     "status": "pending"
+  },
+  {
+    "id": "953",
+    "title": "Madagascar",
+    "poster": "https://image.tmdb.org/t/p/w500/zrV5GnfCcLWzyjrFgYTpjQPRMfl.jpg",
+    "genres": [
+      "Animación",
+      "Comedia",
+      "Aventura"
+    ],
+    "status": "completed"
+  },
+  {
+    "id": "115874",
+    "title": "Segundo origen",
+    "poster": "https://image.tmdb.org/t/p/w500/f3d1JvO6CEJyPDRcRMTXUImgrTS.jpg",
+    "genres": [
+      "Ciencia Ficción",
+      "Acción",
+      "Suspenso"
+    ],
+    "status": "pending"
   }
 ]

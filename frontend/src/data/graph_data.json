@@ -91,6 +91,66 @@
         "Comedia",
         "Aventura"
       ]
+    },
+    {
+      "id": "425",
+      "title": "Ice Age: La edad de hielo",
+      "poster": "https://image.tmdb.org/t/p/w500/yzz9kZPeNtJLd3LxgbO6fBxNxez.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Comedia"
+      ]
+    },
+    {
+      "id": "12",
+      "title": "Buscando a Nemo",
+      "poster": "https://image.tmdb.org/t/p/w500/jPhak722pNGxQIXSEfeWIUqBrO5.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Familia"
+      ]
+    },
+    {
+      "id": "9502",
+      "title": "Kung Fu Panda",
+      "poster": "https://image.tmdb.org/t/p/w500/zcORJ8s9zsBjvKxP0k4FASQSjpf.jpg",
+      "genres": [
+        "Animación",
+        "Acción",
+        "Comedia"
+      ]
+    },
+    {
+      "id": "603",
+      "title": "Matrix",
+      "poster": "https://image.tmdb.org/t/p/w500/tpW2X2DvxtTHJ61iJ7zNYYrJihs.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Acción"
+      ],
+      "description": "Un joven programador descubre que el mundo en el que vive es una simulación virtual creada por máquinas para esclavizar a la humanidad, uniéndose a un grupo de rebeldes para luchar contra sus opresores."
+    },
+    {
+      "id": "115874",
+      "title": "Segundo origen",
+      "poster": "https://image.tmdb.org/t/p/w500/f3d1JvO6CEJyPDRcRMTXUImgrTS.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Acción",
+        "Suspenso"
+      ]
+    },
+    {
+      "id": "335984",
+      "title": "Blade Runner 2049",
+      "poster": "https://image.tmdb.org/t/p/w500/cOt8SQwrxpoTv9Bc3kyce3etkZX.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Misterio"
+      ]
     }
   ],
   "edges": [
@@ -147,6 +207,36 @@
       "source": "808",
       "target": "953",
       "label": "Tiene la misma diversión desenfadada, aventuras ligeras y un humor accesible que hace que Shrek sea tan querido por grandes y chicos."
+    },
+    {
+      "id": "e-953-425",
+      "source": "953",
+      "target": "425",
+      "label": "Comparte la misma dinámica de un grupo improbable de animales viviendo aventuras cómicas y entrañables en un entorno prehistórico."
+    },
+    {
+      "id": "e-953-12",
+      "source": "953",
+      "target": "12",
+      "label": "Mantiene el tono de comedia familiar y la divertida aventura de viaje a través de un vasto mundo animal con personajes carismáticos."
+    },
+    {
+      "id": "e-953-9502",
+      "source": "953",
+      "target": "9502",
+      "label": "Tiene el mismo estilo de animación colorida, humor accesible y carisma en sus protagonistas animales enfrentando grandes desafíos."
+    },
+    {
+      "id": "e-603-115874",
+      "source": "603",
+      "target": "115874",
+      "label": "Explora mundos virtuales complejos y realidades alteradas donde las reglas de la física y la percepción humana son desafiadas."
+    },
+    {
+      "id": "e-603-335984",
+      "source": "603",
+      "target": "335984",
+      "label": "Comparte la atmósfera cyberpunk, la profunda reflexión filosófica sobre la identidad y la estética visual imponente."
     }
   ]
 }

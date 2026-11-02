@@ -1,5 +1,5 @@
 {
-  "name": "mcp-server",
+  "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,9 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.1",
-    "dotenv": "^18.0.1",
-    "zod": "^4.6.5"
+    "dotenv": "^18.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.20.4",

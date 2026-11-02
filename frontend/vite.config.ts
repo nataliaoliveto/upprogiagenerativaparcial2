@@ -39,10 +39,8 @@ const watchlistApi = (): Plugin => ({
     );
 
     server.middlewares.use(async (request, response, next) => {
-      const requestPath = new URL(
-        request.url ?? "/",
-        "http://localhost",
-      ).pathname;
+      const requestPath = new URL(request.url ?? "/", "http://localhost")
+        .pathname;
       if (requestPath !== "/api/watchlist") {
         next();
         return;
@@ -62,7 +60,9 @@ const watchlistApi = (): Plugin => ({
             if (content.trim()) {
               const parsed: unknown = JSON.parse(content);
               if (!isWatchlist(parsed)) {
-                throw new Error("El archivo de watchlist tiene un formato inválido.");
+                throw new Error(
+                  "El archivo de watchlist tiene un formato inválido.",
+                );
               }
               items = parsed;
             }
@@ -85,7 +85,9 @@ const watchlistApi = (): Plugin => ({
         for await (const chunk of request) {
           body += chunk.toString();
           if (body.length > 1_000_000) {
-            sendJson(413, { error: "La watchlist excede el tamaño permitido." });
+            sendJson(413, {
+              error: "La watchlist excede el tamaño permitido.",
+            });
             return;
           }
         }
@@ -110,6 +112,36 @@ const watchlistApi = (): Plugin => ({
               : "Error inesperado al acceder a la watchlist.",
         });
       }
+    });
+
+    // API para el agente curador de grafo
+    server.middlewares.use("/api/agente", async (req, res, next) => {
+      if (req.method !== "POST") return next();
+
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+
+      req.on("end", async () => {
+        try {
+          const { prompt } = JSON.parse(body);
+          // Importamos y ejecutamos el agente desde backend/src/agente_curador_nube.ts
+          const { ejecutarCuradorGrafo } =
+            await import("../backend/src/agente_curador_nube.ts");
+          const resultado = await ejecutarCuradorGrafo(prompt);
+
+          res.setHeader("Content-Type", "application/json");
+          res.statusCode = 200;
+          res.end(JSON.stringify(resultado));
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          res.setHeader("Content-Type", "application/json");
+          res.statusCode = 500;
+          res.end(JSON.stringify({ ok: false, error: message }));
+        }
+      });
     });
   },
 });
