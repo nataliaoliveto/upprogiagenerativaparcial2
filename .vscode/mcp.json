@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "movie-graph-mcp": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "${workspaceFolder}/mcp-server/src/index.ts"
+      ]
+    }
+  }
+}

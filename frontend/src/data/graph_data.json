@@ -1,0 +1,152 @@
+{
+  "nodes": [
+    {
+      "id": "157336",
+      "title": "Interstellar",
+      "poster": "https://image.tmdb.org/t/p/w500/d1QKiYtceF3GDtxvTFXFAqwwah9.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Aventura"
+      ],
+      "description": "Un grupo de exploradores hace uso de un agujero de gusano recientemente descubierto para superar las limitaciones de los viajes espaciales tripulados y vencer las inmensas distancias que tiene un viaje interestelar."
+    },
+    {
+      "id": "329865",
+      "title": "La llegada",
+      "poster": "https://image.tmdb.org/t/p/w500/tbVITeytclB4JKx2LxxasrCCmZx.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Misterio"
+      ]
+    },
+    {
+      "id": "286217",
+      "title": "Marte (The Martian)",
+      "poster": "https://image.tmdb.org/t/p/w500/hBRK1izFxIH3Nh6vax4ssOHSHVd.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Aventura",
+        "Drama"
+      ]
+    },
+    {
+      "id": "49047",
+      "title": "Gravity",
+      "poster": "https://image.tmdb.org/t/p/w500/3CKbEXrw88LNvBU3baISh1I7JP4.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Suspenso"
+      ]
+    },
+    {
+      "id": "568",
+      "title": "Apolo 13",
+      "poster": "https://image.tmdb.org/t/p/w500/h6RBssorNWZQYZN5M4ys9V6Uy0I.jpg",
+      "genres": [
+        "Drama",
+        "Aventura",
+        "Historia"
+      ]
+    },
+    {
+      "id": "808",
+      "title": "Shrek",
+      "poster": "https://image.tmdb.org/t/p/w500/jTQONM7jt1yv2lL972TtmWO0UIZ.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Fantasía"
+      ],
+      "description": "Hace mucho, mucho tiempo, en una lejanísima ciénaga vivía un intratable ogro llamado Shrek. Pero de repente, un día, su absoluta soledad se ve interrumpida por una invasión de sorprendentes personajes de cuento, dando lugar a una aventura divertida, irreverente y llena de encanto."
+    },
+    {
+      "id": "1084244",
+      "title": "Toy Story 5",
+      "poster": "https://image.tmdb.org/t/p/w500/pTjZfbFVWUIwUM5OzX3LVh84ejU.jpg",
+      "genres": [
+        "Animación",
+        "Familia",
+        "Comedia"
+      ]
+    },
+    {
+      "id": "20352",
+      "title": "Gru Mi villano favorito",
+      "poster": "https://image.tmdb.org/t/p/w500/AsaaPLSfisdFDeasEd9r0GiZVss.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Familia"
+      ]
+    },
+    {
+      "id": "953",
+      "title": "Madagascar",
+      "poster": "https://image.tmdb.org/t/p/w500/zrV5GnfCcLWzyjrFgYTpjQPRMfl.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Aventura"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-157336-329865",
+      "source": "157336",
+      "target": "329865",
+      "label": "Combina una gran escala emocional con un enfoque científico muy intenso y una historia sobre la exploración del espacio y el tiempo."
+    },
+    {
+      "id": "e-157336-286217",
+      "source": "157336",
+      "target": "286217",
+      "label": "Mantiene la sensación de aventura espacial, resolución de problemas y una mirada optimista ante la supervivencia en un entorno hostil."
+    },
+    {
+      "id": "e-157336-49047",
+      "source": "157336",
+      "target": "49047",
+      "label": "Tiene una estética espectacular, tensión intensa y una experiencia inmersiva de exploración y supervivencia en el espacio."
+    },
+    {
+      "id": "e-286217-329865",
+      "source": "286217",
+      "target": "329865",
+      "label": "Aunque explora un misterio extraterrestre, mantiene esa mezcla de ciencia, tensión emocional y reflexión profunda sobre la supervivencia humana."
+    },
+    {
+      "id": "e-286217-49047",
+      "source": "286217",
+      "target": "49047",
+      "label": "Tiene la misma intensidad de supervivencia en el espacio, con una estética claustrofóbica y una sensación constante de peligro extremo."
+    },
+    {
+      "id": "e-286217-568",
+      "source": "286217",
+      "target": "568",
+      "label": "Es una película muy cercana en espíritu: resolución de crisis en el espacio, ingenio humano y tensión constante con la misión."
+    },
+    {
+      "id": "e-808-1084244",
+      "source": "808",
+      "target": "1084244",
+      "label": "Tiene ese mismo atractivo familiar, humor brillante y personajes carismáticos que hacen que cada escena sea divertida para todas las edades."
+    },
+    {
+      "id": "e-808-20352",
+      "source": "808",
+      "target": "20352",
+      "label": "Comparten la mezcla de humor absurdo, personajes memorables y una energía animada que funciona muy bien para público familiar."
+    },
+    {
+      "id": "e-808-953",
+      "source": "808",
+      "target": "953",
+      "label": "Tiene la misma diversión desenfadada, aventuras ligeras y un humor accesible que hace que Shrek sea tan querido por grandes y chicos."
+    }
+  ]
+}
