@@ -275,6 +275,7 @@ export default function App() {
           graphRevision={graphRevision}
           onSearch={setLastSearch}
         />
+        <WatchlistSidebar {...watchlistCtrl} />
       </header>
 
       {graphNodes.length === 0 ? (
@@ -330,7 +331,6 @@ export default function App() {
             style={{ background: "#0f172a", width: "100%", height: "100%" }}
           />
 
-          <WatchlistSidebar {...watchlistCtrl} />
         </main>
       )}
     </div>

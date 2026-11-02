@@ -1,16 +1,5 @@
 [
   {
-    "id": "1084244",
-    "title": "Toy Story 5",
-    "poster": "https://image.tmdb.org/t/p/w500/pTjZfbFVWUIwUM5OzX3LVh84ejU.jpg",
-    "genres": [
-      "Animación",
-      "Familia",
-      "Comedia"
-    ],
-    "status": "pending"
-  },
-  {
     "id": "953",
     "title": "Madagascar",
     "poster": "https://image.tmdb.org/t/p/w500/zrV5GnfCcLWzyjrFgYTpjQPRMfl.jpg",
@@ -29,6 +18,17 @@
       "Ciencia Ficción",
       "Acción",
       "Suspenso"
+    ],
+    "status": "pending"
+  },
+  {
+    "id": "264660",
+    "title": "Ex Machina",
+    "poster": "https://image.tmdb.org/t/p/w500/mQohkAkV1m7yT43UnYkgvmyKUoa.jpg",
+    "genres": [
+      "Ciencia Ficción",
+      "Drama",
+      "Misterio"
     ],
     "status": "pending"
   }

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { WatchlistItem } from "./MovieCardNode";
+import "./WatchlistSidebar.css";
 
 interface Props {
   watchlist: WatchlistItem[];
@@ -29,50 +31,49 @@ export const WatchlistSidebar = ({
   setSelectedGenre,
   toggleMovieStatus,
 }: Props) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   return (
-    <aside
-      style={{
-        position: "absolute",
-        right: 18,
-        top: 18,
-        width: 260,
-        maxHeight: "calc(100% - 36px)",
-        background: "rgba(15, 23, 42, 0.9)",
-        border: "1px solid rgba(148, 163, 184, 0.25)",
-        borderRadius: 16,
-        boxShadow: "0 12px 32px rgba(15, 23, 42, 0.42)",
-        padding: 14,
-        boxSizing: "border-box",
-        overflowY: "auto",
-        zIndex: 5,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 12,
-        }}
-      >
-        <h4
-          style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f8fafc" }}
-        >
-          Favoritas
-        </h4>
-        <span
-          style={{
-            fontSize: 12,
-            color: "#facc15",
-            background: "rgba(250, 204, 21, 0.12)",
-            border: "1px solid rgba(250, 204, 21, 0.2)",
-            borderRadius: 999,
-            padding: "4px 8px",
-          }}
-        >
-          {watchlist.length}
-        </span>
-      </div>
+    <div className="watchlist-dock">
+      {isExpanded && (
+        <aside id="watchlist-panel" className="watchlist-panel">
+          <div className="watchlist-panel-header">
+            <button
+              type="button"
+              className="watchlist-collapse"
+              aria-label="Contraer watchlist"
+              aria-expanded={true}
+              aria-controls="watchlist-panel"
+              onClick={() => setIsExpanded(false)}
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+              >
+                <path
+                  d="m14 6-6 6 6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <h4
+              style={{
+                margin: 0,
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#f8fafc",
+              }}
+            >
+              Favoritas
+            </h4>
+            <span className="watchlist-panel-count">{watchlist.length}</span>
+          </div>
 
       {watchlistError && (
         <p role="alert" style={{ color: "#fca5a5", fontSize: 12 }}>
@@ -342,6 +343,21 @@ export const WatchlistSidebar = ({
           </div>
         </div>
       )}
-    </aside>
+        </aside>
+      )}
+      {!isExpanded && (
+        <button
+          type="button"
+          className="watchlist-toggle"
+          aria-label={`Expandir watchlist (${watchlist.length} películas)`}
+          aria-expanded={false}
+          aria-controls="watchlist-panel"
+          onClick={() => setIsExpanded(true)}
+        >
+          <span aria-hidden="true">★</span>
+          <span className="watchlist-toggle-count">{watchlist.length}</span>
+        </button>
+      )}
+    </div>
   );
 };
