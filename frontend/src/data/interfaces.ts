@@ -18,6 +18,14 @@ export interface GraphData {
   edges: GraphEdge[];
 }
 
+export interface WatchlistItem {
+  id: string;
+  title: string;
+  poster: string;
+  genres?: string[];
+  status?: "pending" | "completed";
+}
+
 export interface TmdbMovieResult {
   id: string;
   title: string;

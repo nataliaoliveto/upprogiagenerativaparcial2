@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { WatchlistItem } from "./MovieCardNode";
+import type { GraphMovie, WatchlistItem } from "../data/interfaces";
+import {
+  WatchlistRecommendationsPanel,
+  type RecommendationGroup,
+} from "./WatchlistRecommendationsPanel";
 import "./WatchlistSidebar.css";
 
 interface Props {
@@ -17,6 +21,63 @@ interface Props {
   toggleMovieStatus: (movieId: string) => void;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === "object";
+
+const parseGraphMovie = (value: unknown): GraphMovie | null => {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== "string" ||
+    typeof value.title !== "string" ||
+    typeof value.poster !== "string" ||
+    (value.description !== undefined &&
+      typeof value.description !== "string") ||
+    (value.genres !== undefined &&
+      (!Array.isArray(value.genres) ||
+        !value.genres.every((genre) => typeof genre === "string")))
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    title: value.title,
+    poster: value.poster,
+    description: value.description as string | undefined,
+    genres: value.genres as string[] | undefined,
+  };
+};
+
+const parseSuggestionGroups = (value: unknown): RecommendationGroup[] => {
+  if (!Array.isArray(value)) {
+    throw new Error("El agente devolvió sugerencias con un formato inválido.");
+  }
+
+  return value.map((entry) => {
+    if (!isRecord(entry)) {
+      throw new Error("El agente devolvió un grupo de sugerencias inválido.");
+    }
+
+    const origin = parseGraphMovie(entry.origin);
+    if (!origin || !Array.isArray(entry.recommendations)) {
+      throw new Error("El agente devolvió un origen de sugerencias inválido.");
+    }
+
+    const recommendations = entry.recommendations.map((item) => {
+      if (!isRecord(item) || typeof item.reason !== "string") {
+        throw new Error("El agente devolvió una recomendación inválida.");
+      }
+      const movie = parseGraphMovie(item);
+      if (!movie) {
+        throw new Error("El agente devolvió datos de película inválidos.");
+      }
+      return { ...movie, reason: item.reason };
+    });
+
+    return { origin, recommendations };
+  });
+};
+
 export const WatchlistSidebar = ({
   watchlist,
   isLoaded,
@@ -32,6 +93,70 @@ export const WatchlistSidebar = ({
   toggleMovieStatus,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<RecommendationGroup[]>([]);
+  const [suggestionError, setSuggestionError] = useState("");
+
+  const watchedMovies = watchlist.filter(
+    (movie) => movie.status === "completed",
+  );
+
+  const generateSuggestions = async () => {
+    if (watchedMovies.length === 0 || isGeneratingSuggestions) return;
+
+    setShowSuggestions(true);
+    setIsGeneratingSuggestions(true);
+    setSuggestions([]);
+    setSuggestionError("");
+
+    try {
+      const response = await fetch("/api/agente", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt:
+            "Generá o regenerá las sugerencias personalizadas de Favoritas siguiendo exclusivamente el Skill 3.",
+          source: "watchlist_panel",
+        }),
+      });
+      const data: unknown = await response.json();
+
+      if (
+        !response.ok ||
+        !isRecord(data) ||
+        data.ok !== true ||
+        data.accion !== "get_watchlist_recommendations"
+      ) {
+        const error =
+          isRecord(data) && typeof data.error === "string"
+            ? data.error
+            : "No se pudieron generar las sugerencias.";
+        throw new Error(error);
+      }
+
+      setSuggestions(parseSuggestionGroups(data.sugerencias_por_origen));
+    } catch (error) {
+      console.error("Error generando sugerencias:", error);
+      setSuggestionError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al generar sugerencias.",
+      );
+    } finally {
+      setIsGeneratingSuggestions(false);
+    }
+  };
+
+  const toggleSuggestions = () => {
+    if (showSuggestions) {
+      setShowSuggestions(false);
+      return;
+    }
+
+    setShowSuggestions(true);
+    void generateSuggestions();
+  };
 
   return (
     <div className="watchlist-dock">
@@ -70,7 +195,7 @@ export const WatchlistSidebar = ({
                 color: "#f8fafc",
               }}
             >
-              Favoritas
+              Watchlist
             </h4>
             <span className="watchlist-panel-count">{watchlist.length}</span>
           </div>
@@ -343,7 +468,30 @@ export const WatchlistSidebar = ({
           </div>
         </div>
       )}
+
+      <section className="watchlist-suggestions">
+        <button
+          type="button"
+          className="watchlist-suggestions-heading"
+          aria-expanded={showSuggestions}
+          aria-controls="watchlist-recommendations"
+          onClick={toggleSuggestions}
+        >
+          <span>Sugeridos para ti</span>
+          <span aria-hidden="true">{showSuggestions ? "−" : "+"}</span>
+        </button>
+      </section>
         </aside>
+      )}
+      {showSuggestions && isExpanded && (
+        <WatchlistRecommendationsPanel
+          watchedMovieCount={watchedMovies.length}
+          isGenerating={isGeneratingSuggestions}
+          suggestions={suggestions}
+          error={suggestionError}
+          onClose={() => setShowSuggestions(false)}
+          onRegenerate={() => void generateSuggestions()}
+        />
       )}
       {!isExpanded && (
         <button
@@ -354,7 +502,20 @@ export const WatchlistSidebar = ({
           aria-controls="watchlist-panel"
           onClick={() => setIsExpanded(true)}
         >
-          <span aria-hidden="true">★</span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="21"
+            height="21"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 8h18v12H3z" />
+            <path d="m3 8 2-5h18l-2 5M8 3l3 5m2-5 3 5m2-5 3 5" />
+          </svg>
           <span className="watchlist-toggle-count">{watchlist.length}</span>
         </button>
       )}

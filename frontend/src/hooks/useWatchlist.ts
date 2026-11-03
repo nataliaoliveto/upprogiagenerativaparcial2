@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import type { WatchlistItem } from "../components/MovieCardNode.tsx";
+import type { WatchlistItem } from "../data/interfaces";
 
 const WATCHLIST_API_URL = "/api/watchlist";
 
@@ -142,13 +142,17 @@ export const useWatchlist = () => {
   );
 
   const toggleWatchlist = useCallback(
-    (movie: WatchlistItem) => {
+    (movie: WatchlistItem, status: WatchlistItem["status"] | null) => {
       if (!isLoaded) return;
       const current = watchlistRef.current;
-      const exists = current.some((item) => item.id === movie.id);
-      const next = exists
-        ? current.filter((item) => item.id !== movie.id)
-        : [...current, movie];
+      const next =
+        status === null
+          ? current.filter((item) => item.id !== movie.id)
+          : current.some((item) => item.id === movie.id)
+            ? current.map((item) =>
+                item.id === movie.id ? { ...movie, status } : item,
+              )
+            : [...current, { ...movie, status }];
       replaceWatchlist(next);
     },
     [isLoaded, replaceWatchlist],

@@ -55,7 +55,7 @@ export const InputBar = ({
       const response = await fetch("/api/agente", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: search }),
+        body: JSON.stringify({ prompt: search, source: "search_bar" }),
       });
       const data: unknown = await response.json();
 

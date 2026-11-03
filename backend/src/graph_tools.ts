@@ -6,6 +6,7 @@ import type {
   GraphData,
   MovieBatchInput,
   TmdbMovieResult,
+  WatchlistItem,
 } from "../../frontend/src/data/interfaces.js";
 
 // Obtenemos la ruta física de backend/src/ y subimos 2 niveles a la raíz del proyecto
@@ -30,6 +31,13 @@ const DATA_FILE_PATH = path.join(
   "src",
   "data",
   "graph_data.json",
+);
+const WATCHLIST_FILE_PATH = path.join(
+  PROJECT_ROOT,
+  "frontend",
+  "src",
+  "data",
+  "watchlist_data.json",
 );
 
 // Herramienta 1: Leer el grafo
@@ -133,6 +141,30 @@ export async function addToGraph(movies: MovieBatchInput[]): Promise<string> {
   }
 }
 
+export async function addRecommendationsToGraph(
+  sourceId: string,
+  recommendations: Array<Omit<MovieBatchInput, "sourceId">>,
+): Promise<string> {
+  if (!sourceId.trim()) {
+    throw new Error("El ID de la película de origen es obligatorio.");
+  }
+  if (recommendations.length === 0) {
+    throw new Error("Debes indicar al menos una conexión para agregar.");
+  }
+
+  const graph = await readGraph();
+  if (!graph.nodes.some((movie) => movie.id === sourceId)) {
+    throw new Error(`No se encontró la película de origen ${sourceId} en el grafo.`);
+  }
+
+  return addToGraph(
+    recommendations.map((recommendation) => ({
+      ...recommendation,
+      sourceId,
+    })),
+  );
+}
+
 // Herramienta 4: Eliminar del Grafo (Con Borrado en Cascada)
 export async function removeFromGraph(movieId: string): Promise<string> {
   if (!movieId || movieId.trim() === "") {
@@ -204,5 +236,19 @@ export async function clearRecommendations(movieId: string): Promise<string> {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`Error al limpiar las recomendaciones: ${message}`);
+  }
+}
+
+// Herramienta 6: Leer las favoritas para contextualizar sugerencias
+export async function readWatchlist(): Promise<WatchlistItem[]> {
+  try {
+    const content = await fs.readFile(WATCHLIST_FILE_PATH, "utf-8");
+    if (!content.trim()) return [];
+
+    return JSON.parse(content) as WatchlistItem[];
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Error al leer la watchlist: ${message}`);
   }
 }

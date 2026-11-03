@@ -11,7 +11,7 @@ import { InputBar } from "./components/InputBar";
 import { MovieCardNode, type MovieNodeData } from "./components/MovieCardNode";
 import { WatchlistSidebar } from "./components/WatchlistSidebar";
 import { useWatchlist } from "./hooks/useWatchlist";
-import type { GraphData, GraphMovie } from "./data/interfaces";
+import type { GraphData } from "./data/interfaces";
 
 export default function App() {
   const [graphNodes, setGraphNodes] = useState<Node<MovieNodeData>[]>([]);
@@ -80,96 +80,103 @@ export default function App() {
             childrenMap.get(edge.source)!.push(edge.target);
           });
 
-          const targets = new Set(data.edges.map((edge) => edge.target));
-          const layoutRoots = data.nodes.filter((node) => !targets.has(node.id));
-          if (layoutRoots.length === 0 && data.nodes.length > 0) {
-            layoutRoots.push(data.nodes[0]);
-          }
-
-          const rootByNode = new Map<string, string>();
-          const nodeDepths = new Map<string, number>();
-          const assignReachableNodes = (rootId: string) => {
-            const queue = [{ id: rootId, depth: 0 }];
-            while (queue.length > 0) {
-              const current = queue.shift()!;
-              if (rootByNode.has(current.id)) continue;
-
-              rootByNode.set(current.id, rootId);
-              nodeDepths.set(current.id, current.depth);
-              (childrenMap.get(current.id) ?? []).forEach((childId) => {
-                queue.push({ id: childId, depth: current.depth + 1 });
-              });
-            }
-          };
-
-          layoutRoots.forEach((root) => assignReachableNodes(root.id));
-          data.nodes.forEach((node) => {
-            if (rootByNode.has(node.id)) return;
-            layoutRoots.push(node);
-            assignReachableNodes(node.id);
-          });
-
           const NODE_WIDTH = 310;
           const NODE_GAP_X = 120;
           const ROOT_GAP_X = 280;
           const LEVEL_HEIGHT = 660;
           const layoutCenterX = window.innerWidth / 2;
 
-          const nodesByRootAndDepth = new Map<
-            string,
-            Map<number, GraphMovie[]>
-          >();
-          data.nodes.forEach((node) => {
-            const rootId = rootByNode.get(node.id)!;
-            const depth = nodeDepths.get(node.id) ?? 0;
-            let nodesByDepth = nodesByRootAndDepth.get(rootId);
-            if (!nodesByDepth) {
-              nodesByDepth = new Map();
-              nodesByRootAndDepth.set(rootId, nodesByDepth);
+          const targets = new Set(data.edges.map((edge) => edge.target));
+          const layoutRoots = data.nodes.filter((node) => !targets.has(node.id));
+          const assignedNodes = new Set<string>();
+          const primaryChildren = new Map<string, string[]>();
+          const assignTree = (nodeId: string, parentId?: string) => {
+            if (assignedNodes.has(nodeId)) return;
+            assignedNodes.add(nodeId);
+
+            if (parentId) {
+              const children = primaryChildren.get(parentId) ?? [];
+              children.push(nodeId);
+              primaryChildren.set(parentId, children);
             }
-            const nodesAtDepth = nodesByDepth.get(depth) ?? [];
-            nodesAtDepth.push(node);
-            nodesByDepth.set(depth, nodesAtDepth);
+
+            (childrenMap.get(nodeId) ?? []).forEach((childId) =>
+              assignTree(childId, nodeId),
+            );
+          };
+
+          layoutRoots.forEach((root) => assignTree(root.id));
+          data.nodes.forEach((node) => {
+            if (assignedNodes.has(node.id)) return;
+            layoutRoots.push(node);
+            assignTree(node.id);
           });
 
-          const rootGroupWidths = layoutRoots.map((root) => {
-            const nodesByDepth = nodesByRootAndDepth.get(root.id)!;
-            const widestLevel = Math.max(
-              ...Array.from(nodesByDepth.values(), (nodesAtDepth) =>
-                nodesAtDepth.length * NODE_WIDTH +
-                Math.max(0, nodesAtDepth.length - 1) * NODE_GAP_X,
-              ),
-            );
-            return { rootId: root.id, width: widestLevel };
-          });
+          const subtreeWidths = new Map<string, number>();
+          const getSubtreeWidth = (nodeId: string): number => {
+            const cachedWidth = subtreeWidths.get(nodeId);
+            if (cachedWidth !== undefined) return cachedWidth;
+
+            const children = primaryChildren.get(nodeId) ?? [];
+            const childrenWidth =
+              children.reduce(
+                (total, childId) => total + getSubtreeWidth(childId),
+                0,
+              ) +
+              Math.max(0, children.length - 1) * NODE_GAP_X;
+            const width = Math.max(NODE_WIDTH, childrenWidth);
+            subtreeWidths.set(nodeId, width);
+            return width;
+          };
+
+          const rootGroupWidths = layoutRoots.map((root) => ({
+            rootId: root.id,
+            width: getSubtreeWidth(root.id),
+          }));
           const totalLayoutWidth =
             rootGroupWidths.reduce((total, group) => total + group.width, 0) +
             Math.max(0, rootGroupWidths.length - 1) * ROOT_GAP_X;
           let nextGroupLeft = layoutCenterX - totalLayoutWidth / 2;
-          const rootGroupLefts = new Map<string, number>();
+          const positions = new Map<string, { x: number; y: number }>();
+
+          const positionTree = (
+            nodeId: string,
+            centerX: number,
+            depth: number,
+          ) => {
+            positions.set(nodeId, {
+              x: centerX - NODE_WIDTH / 2,
+              y: 20 + depth * LEVEL_HEIGHT,
+            });
+
+            const children = primaryChildren.get(nodeId) ?? [];
+            const childrenWidth =
+              children.reduce(
+                (total, childId) => total + getSubtreeWidth(childId),
+                0,
+              ) +
+              Math.max(0, children.length - 1) * NODE_GAP_X;
+            let nextChildLeft = centerX - childrenWidth / 2;
+
+            children.forEach((childId) => {
+              const childWidth = getSubtreeWidth(childId);
+              positionTree(childId, nextChildLeft + childWidth / 2, depth + 1);
+              nextChildLeft += childWidth + NODE_GAP_X;
+            });
+          };
+
           rootGroupWidths.forEach((group) => {
-            rootGroupLefts.set(group.rootId, nextGroupLeft);
+            positionTree(
+              group.rootId,
+              nextGroupLeft + group.width / 2,
+              0,
+            );
             nextGroupLeft += group.width + ROOT_GAP_X;
           });
 
           const mappedNodes: Node<MovieNodeData>[] = data.nodes.map((movie) => {
-            const rootId = rootByNode.get(movie.id)!;
-            const depth = nodeDepths.get(movie.id) || 0;
-            const nodesByDepth = nodesByRootAndDepth.get(rootId)!;
-            const levelNodes = nodesByDepth.get(depth)!;
-            const indexInLevel = levelNodes.findIndex((n) => n.id === movie.id);
-            const levelWidth =
-              levelNodes.length * NODE_WIDTH +
-              Math.max(0, levelNodes.length - 1) * NODE_GAP_X;
-            const groupWidth = rootGroupWidths.find(
-              (group) => group.rootId === rootId,
-            )!.width;
-            const x =
-              rootGroupLefts.get(rootId)! +
-              (groupWidth - levelWidth) / 2 +
-              indexInLevel * (NODE_WIDTH + NODE_GAP_X);
-            const y = 20 + depth * LEVEL_HEIGHT;
-
+            const position = positions.get(movie.id)!;
+            const depth = (position.y - 20) / LEVEL_HEIGHT;
             const hasChildren = (childrenMap.get(movie.id)?.length || 0) > 0;
             const isHighlighted = depth === 0 || hasChildren;
             const desc = descriptionByTarget.get(movie.id) || movie.description;
@@ -177,7 +184,7 @@ export default function App() {
             return {
               id: movie.id,
               type: "movieCard",
-              position: { x, y },
+              position,
               data: {
                 title: movie.title,
                 poster: movie.poster,

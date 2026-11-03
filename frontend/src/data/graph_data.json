@@ -151,6 +151,127 @@
         "Ciencia Ficción",
         "Aventura"
       ]
+    },
+    {
+      "id": "425",
+      "title": "Ice Age: La edad de hielo",
+      "poster": "https://image.tmdb.org/t/p/w500/yzz9kZPeNtJLd3LxgbO6fBxNxez.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Comedia"
+      ],
+      "description": "Hace muchos, muchos años, tantos como 20.000, una pequeña ardirata de nombre Scrat quería esconder una bellota en el hielo. Pero lo que hace es provocar una semicatástrofe que provoca que todos los animales migren hacia el sur, hacia tierras más cálidas. Bueno, lo que se dice todos, todos, no. Porque hay uno que lleva la contraria: se trata del mamut Manfred, un auténtico lobo solitario vagabundo y soberbio que va hacia el norte sólo porque los demás están yendo hacia el sur."
+    },
+    {
+      "id": "12",
+      "title": "Buscando a Nemo",
+      "poster": "https://image.tmdb.org/t/p/w500/jPhak722pNGxQIXSEfeWIUqBrO5.jpg",
+      "genres": [
+        "Animación",
+        "Familia",
+        "Aventura"
+      ],
+      "description": "Nemo, un pececillo, hijo único muy querido y protegido por su padre, ha sido capturado en un arrecife australiano y ahora vive en una pecera en la oficina de un dentista de Sidney. El tímido padre de Nemo se embarcará en una peligrosa aventura para rescatar a su hijo. Pero Nemo y sus nuevos amigos tienen también un astuto plan para escapar de la pecera y volver al mar."
+    },
+    {
+      "id": "9502",
+      "title": "Kung Fu Panda",
+      "poster": "https://image.tmdb.org/t/p/w500/zcORJ8s9zsBjvKxP0k4FASQSjpf.jpg",
+      "genres": [
+        "Animación",
+        "Acción",
+        "Comedia"
+      ],
+      "description": "El protagonista es un oso panda llamado Po, el más vago de todas las criaturas del Valle de la Paz. Con poderosos enemigos acercándose, la esperanza es depositada en una antigua profecía que dice que un héroe se alzará para salvarles. Voces originales de Jack Black, Angelina Jolie, Dustin Hoffman, Lucy Liu & Jackie Chan."
+    },
+    {
+      "id": "950",
+      "title": "Ice Age 2: El deshielo",
+      "poster": "https://image.tmdb.org/t/p/w500/wnBEdWq5gplaAgTmYFg4cq89mWi.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Comedia"
+      ],
+      "description": "¡Tus héroes favoritos han vuelto con otra magnífica aventura en esta gélida secuela del magnífico éxito mundial Ice Age! Y esta vez la cosa se calienta como la temperatura ambiente para Manny, Sid, Diego y Scrat, que abandonan su valle para escapar a una auténtica inundación de problemas y emprenden un divertidísimo viaje por un paisaje en pleno deshielo durante el cual conocen a Ellie."
+    },
+    {
+      "id": "9693",
+      "title": "Hijos de los hombres",
+      "poster": "https://image.tmdb.org/t/p/w500/jxVLES5eTLuJgeYs0ywCLZbbQW1.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Suspenso"
+      ],
+      "description": "Año 2027: el ser humano está al borde de la extinción: los hombres han perdido la capacidad de procrear y se ignora por qué razon todas las mujeres del planeta se han vuelto estériles. Al mismo tiempo, el mundo se estremece cuando muere un muchacho de 18 años, la persona más joven de la Tierra. Se vive, pues, una situación de caos galopante. En tales circunstancias, Theo (Clive Owen), un desilusionado ex-activista radical de Londres convertido en burócrata, es contratado por Julian (Julianne Moore) para que proteja a una mujer que puede tener el secreto de la salvación de la humanidad, la persona más valiosa de la Tierra..."
+    },
+    {
+      "id": "6479",
+      "title": "Soy leyenda",
+      "poster": "https://image.tmdb.org/t/p/w500/pO1SrJgf5BumqcIRkYviSGIFdmX.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Acción"
+      ],
+      "description": "Año 2012. Robert Neville es el último hombre vivo que hay sobre la Tierra, pero no está solo. Los demás seres humanos se han convertido en unos mutantes nocturnos llamados \"Darkseekers\" y todos ansían beber su sangre. Durante el día vive en estado de alerta, como un cazador, y busca a los muertos vivientes mientras duermen; pero durante la noche debe esconderse de ellos y esperar el amanecer. Esta pesadilla empezó hace tres años: Neville era un brillante científico, pero no pudo impedir la expansión de un terrible virus creado por el hombre. Él ha sobrevivido porque es inmune al virus; todos los días envía mensajes por radio con la esperanza de que haya otros supervivientes, pero es inútil. Lo único que puede hacer es buscar una fórmula que le permita utilizar su sangre inmune para devolverles a los hombres su naturaleza. Pero está en inferioridad de condiciones y el tiempo se acaba."
+    },
+    {
+      "id": "72190",
+      "title": "Guerra Mundial Z",
+      "poster": "https://image.tmdb.org/t/p/w500/a8ogjWFd0QS6BzBkzfDMWukc26i.jpg",
+      "genres": [
+        "Acción",
+        "Drama",
+        "Ciencia Ficción"
+      ],
+      "description": "Cuando el mundo comienza a ser invadido por una legión de muertos vivientes, Gerry Lane, un experto investigador de las Naciones Unidas, intentará evitar el fin de la civilización en una carrera contra el tiempo y el destino. La destrucción a la que se ve sometida la raza humana lo lleva a recorrer el mundo entero buscando la solución para frenar esa horrible epidemia."
+    },
+    {
+      "id": "20504",
+      "title": "El libro de Eli",
+      "poster": "https://image.tmdb.org/t/p/w500/ufvg1HHiFSiRRpwEMYK5gbYpTi.jpg",
+      "genres": [
+        "Acción",
+        "Aventura",
+        "Drama"
+      ],
+      "description": "En un futuro apocalíptico, 30 años después del \"resplandor\" que aniquiló la casi totalidad de la sociedad civilizada, unos pocos humanos sobreviven en un ambiente increíblemente hostil y árido. Violaciones, canibalismo y salvajismo imperan en unas derruidas ciudades donde el más fuerte y el que posee el agua impone su ley. Vagando por la carretera, un guerrero solitario (Denzel Washington) se dirige al oeste con una sola misión: proteger un misterioso libro que lleva en su mochila."
+    },
+    {
+      "id": "370663",
+      "title": "Below Her Mouth",
+      "poster": "https://image.tmdb.org/t/p/w500/tPhBftWySbanfEialbsUzOuccgN.jpg",
+      "genres": [
+        "Romance",
+        "Ciencia Ficción",
+        "Drama"
+      ],
+      "description": "Dallas (Erika Linder), quien acaba de terminar con su pareja, lleva a cabo la agresiva seducción de Jasmine (Natalie Krill), una aparente heterosexual, comprometida a casarse con su novio."
+    },
+    {
+      "id": "17431",
+      "title": "Moon",
+      "poster": "https://image.tmdb.org/t/p/w500/nGqJXp5nfLyd12T7YIhcFatOFxz.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Misterio"
+      ],
+      "description": "La película cuenta la historia de Sam Bell, un astronauta que se encuentra cerca de finalizar su contrato con Lunar, empresa para la que ha trabajado durante tres años viviendo en Selene, una base lunar desde la que ha estado extrayendo gas de la mina Helium 3, a causa de la terrible crisis energética que está pasando la Tierra. Dos semanas antes de su regreso a casa con su mujer y su hija, Sam comienza a tener extrañas visiones y a sentirse extraño, pero no será hasta la llegada de sus sustituto cuando Sam vea sus sospechas en cuanto a los verdaderos propósitos de Lunar hechos realidad, pues algo más que su contrato va a expirar en breve."
+    },
+    {
+      "id": "404214",
+      "title": "Transcendência",
+      "poster": "https://image.tmdb.org/t/p/w500/rA9AImkfTBKVAOs9iAjtdlCkTnw.jpg",
+      "genres": [
+        "Ciencia Ficción",
+        "Drama",
+        "Misterio"
+      ],
+      "description": ""
     }
   ],
   "edges": [
@@ -237,6 +358,72 @@
       "source": "335984",
       "target": "861",
       "label": "Mantiene la temática de Philip K. Dick sobre realidades alteradas, identidades dudosas y futuros hipertecnológicos."
+    },
+    {
+      "id": "e-953-425",
+      "source": "953",
+      "target": "425",
+      "label": "Comparte el mismo estilo de animación humorística y un grupo de animales parlanchines viviendo aventuras disparatadas."
+    },
+    {
+      "id": "e-953-12",
+      "source": "953",
+      "target": "12",
+      "label": "Mantiene el tono de comedia familiar y un viaje dinámico lleno de personajes entrañables en entornos naturales."
+    },
+    {
+      "id": "e-953-9502",
+      "source": "953",
+      "target": "9502",
+      "label": "Ofrece una comedia animada sumamente divertida con protagonistas animales carismáticos y secuencias llenas de ritmo."
+    },
+    {
+      "id": "e-953-950",
+      "source": "953",
+      "target": "950",
+      "label": "Mantiene el humor absurdo, la comedia familiar y un grupo dispar de animales viviendo aventuras."
+    },
+    {
+      "id": "e-115874-9693",
+      "source": "115874",
+      "target": "9693",
+      "label": "Comparte la temática de un mundo post-apocalíptico donde la supervivencia humana se encuentra al límite."
+    },
+    {
+      "id": "e-115874-6479",
+      "source": "115874",
+      "target": "6479",
+      "label": "Comparte la premisa de un mundo desolado donde el protagonista lucha por la supervivencia de la humanidad."
+    },
+    {
+      "id": "e-115874-72190",
+      "source": "115874",
+      "target": "72190",
+      "label": "Mantiene la tensión constante ante una catástrofe global que amenaza con extinguir la civilización."
+    },
+    {
+      "id": "e-115874-20504",
+      "source": "115874",
+      "target": "20504",
+      "label": "Explora un entorno post-apocalíptico desolado con un fuerte tono de suspenso y supervivencia."
+    },
+    {
+      "id": "e-264660-370663",
+      "source": "264660",
+      "target": "370663",
+      "label": "Profundiza en la compleja relación psicológica y emocional entre un humano y una inteligencia artificial avanzada."
+    },
+    {
+      "id": "e-264660-17431",
+      "source": "264660",
+      "target": "17431",
+      "label": "Comparte esa atmósfera claustrofóbica, cerebral y de aislamiento tecnológico con giros inesperados."
+    },
+    {
+      "id": "e-264660-404214",
+      "source": "264660",
+      "target": "404214",
+      "label": "Aborda los dilemas éticos y los límites de la fusión entre la conciencia humana y la inteligencia artificial."
     }
   ]
 }

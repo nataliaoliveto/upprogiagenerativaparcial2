@@ -1,5 +1,6 @@
 import type { MouseEvent } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
+import type { WatchlistItem } from "../data/interfaces";
 
 export interface MovieNodeData {
   title: string;
@@ -8,18 +9,13 @@ export interface MovieNodeData {
   genres?: string[];
 }
 
-export interface WatchlistItem {
-  id: string;
-  title: string;
-  poster: string;
-  genres?: string[];
-  status?: "pending" | "completed";
-}
-
 interface MovieCardNodeProps extends NodeProps<MovieNodeData> {
   watchlist: WatchlistItem[];
   watchlistReady: boolean;
-  onToggleWatchlist: (movie: WatchlistItem) => void;
+  onToggleWatchlist: (
+    movie: WatchlistItem,
+    status: WatchlistItem["status"] | null,
+  ) => void;
 }
 
 export const MovieCardNode = ({
@@ -29,21 +25,36 @@ export const MovieCardNode = ({
   watchlistReady,
   onToggleWatchlist,
 }: MovieCardNodeProps) => {
-  const isFavorite = watchlist.some((item) => item.id === String(id));
+  const watchlistMovie = watchlist.find((item) => item.id === String(id));
+  const status = watchlistMovie ? (watchlistMovie.status ?? "pending") : null;
 
-  const handleToggleFavorite = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleCycleWatchlistStatus = (
+    event: MouseEvent<HTMLButtonElement>,
+  ) => {
     event.stopPropagation();
 
-    const nextMovie: WatchlistItem = {
+    const movie: WatchlistItem = {
       id: String(id),
       title: data.title,
       poster: data.poster,
       genres: data.genres ?? [],
-      status: "pending",
     };
 
-    onToggleWatchlist(nextMovie);
+    const nextStatus =
+      status === null
+        ? "pending"
+        : status === "pending"
+          ? "completed"
+          : null;
+    onToggleWatchlist(movie, nextStatus);
   };
+
+  const statusLabel =
+    status === "pending"
+      ? "Pendiente. Marcar como vista"
+      : status === "completed"
+        ? "Vista. Quitar de la watchlist"
+        : "No está en la watchlist. Agregar como pendiente";
 
   return (
     <div
@@ -67,9 +78,8 @@ export const MovieCardNode = ({
       <button
         type="button"
         disabled={!watchlistReady}
-        aria-label={
-          isFavorite ? "Quitar de la watchlist" : "Agregar a la watchlist"
-        }
+        aria-label={statusLabel}
+        title={statusLabel}
         className="nodrag nopan"
         onMouseDown={(e) => {
           e.preventDefault();
@@ -83,7 +93,7 @@ export const MovieCardNode = ({
           e.preventDefault();
           e.stopPropagation();
         }}
-        onClick={handleToggleFavorite}
+        onClick={handleCycleWatchlistStatus}
         style={{
           position: "absolute",
           top: 10,
@@ -91,12 +101,25 @@ export const MovieCardNode = ({
           width: 30,
           height: 30,
           borderRadius: "50%",
-          border: "1px solid rgba(250, 204, 21, 0.5)",
-          background: isFavorite
-            ? "rgba(250, 204, 21, 0.2)"
-            : "rgba(15, 23, 42, 0.7)",
-          color: isFavorite ? "#facc15" : "#e2e8f0",
-          fontSize: 18,
+          border: `1px solid ${
+            status === "completed"
+              ? "rgba(34, 197, 94, 0.5)"
+              : status === "pending"
+                ? "rgba(250, 204, 21, 0.5)"
+                : "rgba(148, 163, 184, 0.5)"
+          }`,
+          background:
+            status === "completed"
+              ? "rgba(34, 197, 94, 0.16)"
+              : status === "pending"
+                ? "rgba(250, 204, 21, 0.16)"
+                : "rgba(15, 23, 42, 0.7)",
+          color:
+            status === "completed"
+              ? "#4ade80"
+              : status === "pending"
+                ? "#facc15"
+                : "#94a3b8",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -106,7 +129,52 @@ export const MovieCardNode = ({
           pointerEvents: "auto",
         }}
       >
-        {isFavorite ? "★" : "☆"}
+        {status === "pending" ? (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+        ) : status === "completed" ? (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8 12 2.5 2.5L16 9" />
+          </svg>
+        ) : (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4 8h16v12H4z" />
+            <path d="m4 8 2-5h16l-2 5M9 3l3 5m2-5 3 5" />
+          </svg>
+        )}
       </button>
 
       <Handle

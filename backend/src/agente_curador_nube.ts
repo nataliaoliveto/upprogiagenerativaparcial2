@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import {
   readGraph,
+  readWatchlist,
   searchTmdb,
   addToGraph,
   removeFromGraph,
@@ -40,15 +41,31 @@ export interface RecomendacionIA {
   reason: string;
 }
 
+export interface SugerenciasPorOrigenIA {
+  origen_id: string;
+  origen_titulo: string;
+  recomendaciones: RecomendacionIA[];
+}
+
 export interface RespuestaAgenteJSON {
-  skill_invocada: "SKILL_1_CREACION" | "SKILL_2_ELIMINACION";
-  accion: "add_to_graph" | "remove_from_graph" | "clear_recommendations";
+  skill_invocada:
+    | "SKILL_1_CREACION"
+    | "SKILL_2_ELIMINACION"
+    | "SKILL_3_SUGERENCIAS"
+    | "SKILL_4_SUGERENCIAS_AUTOMATICAS";
+  accion:
+    | "add_to_graph"
+    | "remove_from_graph"
+    | "clear_recommendations"
+    | "get_watchlist_recommendations"
+    | "add_watchlist_recommendations";
   pelicula_origen?: {
     title: string;
     genres: string[];
     description: string;
   };
   recomendaciones?: RecomendacionIA[];
+  sugerencias_por_origen?: SugerenciasPorOrigenIA[];
   target_movie_id?: string;
   mensaje_confirmacion: string;
 }
@@ -193,24 +210,163 @@ export async function llamarGeminiNube(
  * FUNCIÓN PRINCIPAL QUE DISPARA EL FRONTEND:
  * Recibe el texto del <input>, consulta al Agente Gemini y ejecuta las tools del grafo.
  */
-export async function ejecutarCuradorGrafo(pedidoUsuario: string) {
-  // 1. Leer el estado actual del grafo (Tool 1: readGraph)
-  const grafoActual = await readGraph();
+export async function ejecutarCuradorGrafo(
+  pedidoUsuario: string,
+  origenSolicitud: "search_bar" | "watchlist_panel" = "search_bar",
+) {
+  // El contexto del agente se obtiene del estado actual del grafo y Favoritas.
+  const [grafoActual, watchlist] = await Promise.all([
+    readGraph(),
+    readWatchlist(),
+  ]);
 
   // 2. Cargar las reglas y Skills desde .github/agents/curador_grafo.agent.md
   const promptSistema = await cargarPromptAgente();
 
   // 3. Armar el contexto de entrada para el usuario
-  const promptUsuario = `Estado actual del grafo (JSON):
+  const instruccionesDeRuta =
+    origenSolicitud === "search_bar"
+      ? 'La solicitud viene de la barra de búsqueda. Si pide recomendaciones basadas en Favoritas, responde con accion "add_watchlist_recommendations" para agregarlas automáticamente al grafo.'
+      : 'La solicitud viene del panel de Favoritas. Devuelve sugerencias temporales con accion "get_watchlist_recommendations" y no las guardes en el grafo.';
+  const promptUsuario = `${instruccionesDeRuta}
+
+Estado actual del grafo (JSON):
 ${JSON.stringify(grafoActual, null, 2)}
+
+Favoritas actuales (JSON):
+${JSON.stringify(watchlist, null, 2)}
 
 Pedido del usuario: "${pedidoUsuario}"`;
 
   // 4. Consultar a Gemini en la nube
-  const { decision, telemetria } = await llamarGeminiNube(
+  const { decision: respuestaGemini, telemetria } = await llamarGeminiNube(
     promptSistema,
     promptUsuario,
   );
+  const decision =
+    origenSolicitud === "search_bar" &&
+    respuestaGemini.accion === "get_watchlist_recommendations"
+      ? {
+          ...respuestaGemini,
+          skill_invocada: "SKILL_4_SUGERENCIAS_AUTOMATICAS" as const,
+          accion: "add_watchlist_recommendations" as const,
+        }
+      : respuestaGemini;
+
+  if (
+    decision.accion === "get_watchlist_recommendations" ||
+    decision.accion === "add_watchlist_recommendations"
+  ) {
+    const expectedSkill =
+      decision.accion === "get_watchlist_recommendations"
+        ? "SKILL_3_SUGERENCIAS"
+        : "SKILL_4_SUGERENCIAS_AUTOMATICAS";
+    if (
+      decision.skill_invocada !== expectedSkill ||
+      !Array.isArray(decision.sugerencias_por_origen)
+    ) {
+      throw new Error(
+        "El agente devolvió sugerencias con un formato incompleto.",
+      );
+    }
+
+    const suggestionGroups = await Promise.all(
+      decision.sugerencias_por_origen.map(async (group) => {
+        const origin = watchlist.find(
+          (movie) =>
+            movie.id === group.origen_id && movie.status === "completed",
+        );
+        if (!origin) {
+          throw new Error(
+            `El agente devolvió un origen que no está marcado como visto: "${group.origen_titulo}".`,
+          );
+        }
+        if (
+          !Array.isArray(group.recomendaciones) ||
+          group.recomendaciones.length !== 3
+        ) {
+          throw new Error(
+            `El agente debe devolver exactamente 3 sugerencias para "${origin.title}".`,
+          );
+        }
+
+        const recommendations = await Promise.all(
+          group.recomendaciones.map(async (recommendation) => {
+            const movie = await searchTmdb(recommendation.title);
+            if (!movie) {
+              throw new Error(
+                `TMDB no encontró la sugerencia "${recommendation.title}" para "${origin.title}".`,
+              );
+            }
+            return {
+              id: movie.id,
+              title: movie.title,
+              poster: movie.poster,
+              description: movie.overview,
+              genres: recommendation.genres,
+              reason: recommendation.reason,
+            };
+          }),
+        );
+
+        return { origin, recommendations };
+      }),
+    );
+
+    if (decision.accion === "get_watchlist_recommendations") {
+      return {
+        ok: true,
+        skill: decision.skill_invocada,
+        accion: decision.accion,
+        mensaje: decision.mensaje_confirmacion,
+        sugerencias_por_origen: suggestionGroups,
+        telemetria,
+      };
+    }
+
+    const graphMovieIds = new Set(grafoActual.nodes.map((movie) => movie.id));
+    const recommendationsToAdd: MovieBatchInput[] = [];
+    for (const { origin, recommendations } of suggestionGroups) {
+      if (!graphMovieIds.has(origin.id)) {
+        throw new Error(
+          `No se puede agregar recomendaciones porque "${origin.title}" no está en el grafo.`,
+        );
+      }
+
+      recommendationsToAdd.push(
+        ...recommendations.map((recommendation) => ({
+          movieId: recommendation.id,
+          title: recommendation.title,
+          poster: recommendation.poster,
+          genres: recommendation.genres,
+          description: recommendation.description,
+          sourceId: origin.id,
+          reason: recommendation.reason,
+        })),
+      );
+    }
+
+    if (recommendationsToAdd.length === 0) {
+      return {
+        ok: true,
+        skill: decision.skill_invocada,
+        accion: decision.accion,
+        mensaje: decision.mensaje_confirmacion,
+        detalleTecnico: "No hay películas vistas para agregar recomendaciones.",
+        telemetria,
+      };
+    }
+
+    const detalleTecnico = await addToGraph(recommendationsToAdd);
+    return {
+      ok: true,
+      skill: decision.skill_invocada,
+      accion: decision.accion,
+      mensaje: decision.mensaje_confirmacion,
+      detalleTecnico,
+      telemetria,
+    };
+  }
 
   // 5. Ejecutar la Skill correspondiente usando las herramientas de graph_tools.ts
   let resultadoOperacion = "";
