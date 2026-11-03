@@ -1,7 +1,7 @@
 ---
 name: CuradorGrafo
 description: "Gestiona el grafo visual de películas: agrega recomendaciones y elimina películas o sus ramas."
-model: gemini-2.5-flash
+model: gemini-3.5-flash-lite
 tools:
   - read_graph
   - read_watchlist

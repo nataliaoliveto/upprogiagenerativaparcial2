@@ -3,6 +3,9 @@ node_modules/
 /frontend/node_modules/
 /mcp-server/node_modules/
 
+# Caché y resultados de Vite/Vitest
+.vite/
+
 # Archivos de compilación (Build)
 dist/
 build/
