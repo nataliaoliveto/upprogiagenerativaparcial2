@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "vitest": ["../frontend/node_modules/vitest"],
+      "*": ["../frontend/node_modules/*", "../backend/node_modules/*"]
+    }
+  },
+  "include": ["./**/*.ts", "../backend/src/**/*.ts", "../frontend/src/**/*.ts"]
+}
