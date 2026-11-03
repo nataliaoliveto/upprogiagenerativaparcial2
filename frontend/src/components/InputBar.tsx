@@ -7,6 +7,8 @@ interface InputBarProps {
   onSearch: (query: string) => void;
 }
 
+const MAX_QUERY_LENGTH = 300;
+
 const SearchIcon = () => (
   <svg
     aria-hidden="true"
@@ -46,6 +48,12 @@ export const InputBar = ({
     event.preventDefault();
     const search = query.trim();
     if (!search || isLoading) return;
+    if (search.length > MAX_QUERY_LENGTH) {
+      setAgentMessage(
+        `La búsqueda no puede superar los ${MAX_QUERY_LENGTH} caracteres.`,
+      );
+      return;
+    }
 
     onSearch(search);
     setIsLoading(true);
@@ -115,6 +123,7 @@ export const InputBar = ({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            maxLength={MAX_QUERY_LENGTH}
             placeholder="Ej: Recomendar a partir de Matrix..."
             aria-label="Buscar recomendaciones de películas"
             disabled={isLoading}

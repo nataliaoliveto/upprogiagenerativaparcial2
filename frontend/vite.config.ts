@@ -67,6 +67,9 @@ const isAddConnectionsRequest = (
         typeof recommendation.description === "string"),
   );
 
+const MAX_AGENT_BODY_BYTES = 10_000;
+const MAX_AGENT_PROMPT_LENGTH = 300;
+
 const watchlistApi = (): Plugin => ({
   name: "watchlist-json-api",
   configureServer(server) {
@@ -210,32 +213,82 @@ const watchlistApi = (): Plugin => ({
     server.middlewares.use("/api/agente", async (req, res, next) => {
       if (req.method !== "POST") return next();
 
-      let body = "";
-      req.on("data", (chunk) => {
-        body += chunk.toString();
-      });
+      const sendJson = (status: number, data: unknown) => {
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.statusCode = status;
+        res.end(JSON.stringify(data));
+      };
 
-      req.on("end", async () => {
-        try {
-          const { prompt, source } = JSON.parse(body);
-          const requestSource =
-            source === "watchlist_panel" ? "watchlist_panel" : "search_bar";
-          // Importamos y ejecutamos el agente desde backend/src/agente_curador_nube.ts
-          const { ejecutarCuradorGrafo } =
-            await import("../backend/src/agente_curador_nube.ts");
-          const resultado = await ejecutarCuradorGrafo(prompt, requestSource);
+      try {
+        const bodyChunks: Buffer[] = [];
+        let bodySize = 0;
+        let bodyTooLarge = false;
+        for await (const chunk of req) {
+          if (bodyTooLarge) continue;
 
-          res.setHeader("Content-Type", "application/json");
-          res.statusCode = 200;
-          res.end(JSON.stringify(resultado));
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          res.setHeader("Content-Type", "application/json");
-          res.statusCode = 500;
-          res.end(JSON.stringify({ ok: false, error: message }));
+          const chunkBuffer = Buffer.isBuffer(chunk)
+            ? chunk
+            : Buffer.from(String(chunk));
+          bodySize += chunkBuffer.byteLength;
+          if (bodySize > MAX_AGENT_BODY_BYTES) {
+            bodyTooLarge = true;
+            bodyChunks.length = 0;
+            sendJson(413, {
+              ok: false,
+              error: "La solicitud excede el tamaño permitido.",
+            });
+            continue;
+          }
+          bodyChunks.push(chunkBuffer);
         }
-      });
+        if (bodyTooLarge) return;
+
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(Buffer.concat(bodyChunks).toString("utf-8"));
+        } catch {
+          sendJson(400, {
+            ok: false,
+            error: "El cuerpo de la solicitud no es JSON válido.",
+          });
+          return;
+        }
+
+        const prompt =
+          parsed !== null &&
+          typeof parsed === "object" &&
+          "prompt" in parsed
+            ? parsed.prompt
+            : undefined;
+        if (
+          typeof prompt !== "string" ||
+          prompt.trim().length === 0 ||
+          prompt.length > MAX_AGENT_PROMPT_LENGTH
+        ) {
+          sendJson(400, {
+            ok: false,
+            error: "El prompt debe ser un texto no vacío de hasta 300 caracteres.",
+          });
+          return;
+        }
+
+        const source =
+          parsed !== null &&
+          typeof parsed === "object" &&
+          "source" in parsed
+            ? parsed.source
+            : undefined;
+        const requestSource =
+          source === "watchlist_panel" ? "watchlist_panel" : "search_bar";
+        // Importamos y ejecutamos el agente desde backend/src/agente_curador_nube.ts
+        const { ejecutarCuradorGrafo } =
+          await import("../backend/src/agente_curador_nube.ts");
+        const resultado = await ejecutarCuradorGrafo(prompt, requestSource);
+        sendJson(200, resultado);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        sendJson(500, { ok: false, error: message });
+      }
     });
   },
 });
