@@ -72,7 +72,6 @@ export interface RespuestaAgenteJSON {
 }
 
 /**
- * Equivalente a cargar_prompt_agente() de agentes_simulacion.py:
  * Lee el archivo .agent.md y elimina la cabecera YAML (entre --- y ---).
  */
 export async function cargarPromptAgente(): Promise<string> {
@@ -92,7 +91,6 @@ export async function cargarPromptAgente(): Promise<string> {
 }
 
 /**
- * Equivalente a extraer_json_robusto() de agentes_simulacion.py:
  * Limpia bloques markdown ```json y extrae el objeto JSON válido.
  */
 export function extraerJsonRobusto(texto: string): RespuestaAgenteJSON {
@@ -108,7 +106,6 @@ export function extraerJsonRobusto(texto: string): RespuestaAgenteJSON {
 }
 
 /**
- * Equivalente a llamar_ollama() + analizador_nube.py:
  * Envía el System Prompt (.agent.md) y el pedido del usuario a Gemini API
  * configurando temperatura, topP, maxOutputTokens y midiendo telemetría.
  */
@@ -124,7 +121,7 @@ export async function llamarGeminiNube(
 
   let ultimoErrorStatus = 0;
 
-  // Recorremos los pools de modelos: si uno da 503 por demanda, salta de inmediato al siguiente modelo real
+  // Recorremos los pools de modelos: si uno da 503 por demanda, salta de inmediato al siguiente modelo
   for (const modeloActual of MODELOS_GEMINI_POOL) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modeloActual}:generateContent`;
     const inicio = Date.now();
