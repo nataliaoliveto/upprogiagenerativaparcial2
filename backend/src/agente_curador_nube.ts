@@ -29,10 +29,11 @@ const AGENT_MD_PATH = path.join(
 );
 
 // Lista de pools independientes de Gemini (del más potente al más liviano/rápido)
-// Usa los nombres reales de los modelos de Gemini
-//const MODELOS_GEMINI_POOL = ["gemini-flash-latest"];
-//, "gemini-3.8-flash"
-const MODELOS_GEMINI_POOL = ["gemini-3.5-flash-lite"];
+const MODELOS_GEMINI_POOL = [
+  "gemini-3.5-flash-lite",
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
+];
 
 // Interfaces de la respuesta JSON que devuelve el Agente según el .agent.md
 export interface RecomendacionIA {

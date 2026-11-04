@@ -54,9 +54,6 @@ Cuando el usuario solicite pruebas de integración entre componentes o servicios
 - No modifiques la lógica funcional de `backend/` ni `frontend/` salvo que sea indispensable para exportar una función a testear.
 - Nunca realices llamadas HTTP reales a TMDB o Gemini durante los tests; usa siempre los mocks de `tests/mocks/`.
 - Todos los tests deben incluir los comentarios `// Arrange`, `// Act` y `// Assert`.
-
-# Restricciones
-
 - PROHIBIDO usar el tipo `any` (cumple con `@typescript-eslint/no-explicit-any`). Importa y utiliza siempre los tipos estrictos desde `../frontend/src/data/interfaces.js` (como `MovieBatchInput`, `GraphData`, `TmdbMovieResult`) o `unknown`.
 - En `beforeEach` y `afterEach`, conserva siempre un bloque `try/catch` al leer `graph_data.json` por si el archivo no existe inicialmente.
 - Para ejecutar las pruebas en la terminal, usa SIEMPRE el comando no interactivo con salida detallada desde la carpeta `frontend`: `npx vitest run --root .. --reporter=verbose` (nunca ejecutes `vitest` sin `run` porque bloquea la terminal en modo watch).
