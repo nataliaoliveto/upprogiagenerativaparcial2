@@ -114,6 +114,15 @@ export async function llamarGeminiNube(
   promptSistema: string,
   promptUsuario: string,
 ): Promise<{ decision: RespuestaAgenteJSON; telemetria: any }> {
+  if (
+    typeof promptSistema !== "string" ||
+    promptSistema.length > 20_000 ||
+    typeof promptUsuario !== "string" ||
+    promptUsuario.length > 32_000
+  ) {
+    throw new Error("El contexto enviado al agente excede el límite permitido.");
+  }
+
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("Falta configurar GEMINI_API_KEY en el servidor.");
@@ -133,6 +142,7 @@ export async function llamarGeminiNube(
           "Content-Type": "application/json",
           "x-goog-api-key": apiKey,
         },
+        signal: AbortSignal.timeout(15_000),
         body: JSON.stringify({
           system_instruction: {
             parts: [{ text: promptSistema }],
@@ -212,6 +222,19 @@ export async function ejecutarCuradorGrafo(
   pedidoUsuario: string,
   origenSolicitud: "search_bar" | "watchlist_panel" = "search_bar",
 ) {
+  if (typeof pedidoUsuario !== "string" || !pedidoUsuario.trim()) {
+    throw new Error("El pedido del usuario es obligatorio.");
+  }
+  if (pedidoUsuario.length > 4_000) {
+    throw new Error("El pedido del usuario excede el límite permitido.");
+  }
+  if (
+    origenSolicitud !== "search_bar" &&
+    origenSolicitud !== "watchlist_panel"
+  ) {
+    throw new Error("El origen de la solicitud no es válido.");
+  }
+
   // El contexto del agente se obtiene del estado actual del grafo y Favoritas.
   const [grafoActual, watchlist] = await Promise.all([
     readGraph(),

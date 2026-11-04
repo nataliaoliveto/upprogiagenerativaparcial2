@@ -272,6 +272,80 @@
         "Misterio"
       ],
       "description": ""
+    },
+    {
+      "id": "127380",
+      "title": "Buscando a Dory",
+      "poster": "https://image.tmdb.org/t/p/w500/wXBwo2DxTm6wZ8Cbu02t9kzzoK4.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Comedia"
+      ],
+      "description": "Un año después de los acontecimientos narrados en \"Buscando a Nemo\", Dory vive apaciblemente con Marlin y su hijo Nemo. Pero durante un viaje para ver cómo las mantarrayas migran de vuelta a casa, los problemas de memoria de Dory parecen desaparecer durante un segundo: recuerda que tiene una familia e inmediatamente decide emprender viaje para reencontrarse con sus padres, a los que perdió hace años."
+    },
+    {
+      "id": "9806",
+      "title": "Los Increíbles",
+      "poster": "https://image.tmdb.org/t/p/w500/al1jusd4T7JPatZlj4BuYkDDOzr.jpg",
+      "genres": [
+        "Animación",
+        "Acción",
+        "Aventura"
+      ],
+      "description": "Como Mr. Increíble y Elastigirl, Bob y su esposa Helen estaban entre los mejores luchadores contra el crimen. Por fin pueden volver a la acción cuando una misteriosa llamada cita a Bob en una isla remota."
+    },
+    {
+      "id": "14160",
+      "title": "Up",
+      "poster": "https://image.tmdb.org/t/p/w500/1N0LtzUueXrlnpL466jQBJ6iAuj.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Aventura"
+      ],
+      "description": "Tras atar miles de globos a su casa, Carl Fredricksen, un vendedor de globos jubilado, se embarca en el mundo de los sueños de la infancia. Pero sin que Carl lo sepa, Russell, un explorador de 8 años, se encuentra en el lugar equivocado en el momento equivocado: el porche delantero de la casa. El dúo más improbable conoce a fantásticos amigos como Dug, un perro con un collar especial que le permite hablar, y Kevin, un pájaro de cuatro metros de altura que no vuela. Atrapados en la selva, Carl se da cuenta de que a veces las mayores aventuras de la vida son las que menos esperabas."
+    },
+    {
+      "id": "1087192",
+      "title": "Cómo entrenar a tu dragón",
+      "poster": "https://image.tmdb.org/t/p/w500/9Zr7ZyiMpgMhhxJQi1tQJp9LGho.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Fantasía"
+      ]
+    },
+    {
+      "id": "417859",
+      "title": "El Gato con Botas",
+      "poster": "https://image.tmdb.org/t/p/w500/1VmrC82zY4U33l9UHlZTWDB1asN.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Aventura"
+      ]
+    },
+    {
+      "id": "49519",
+      "title": "Los Croods",
+      "poster": "https://image.tmdb.org/t/p/w500/3X3qtBTgKt5mCB30RJwbIjgjzdw.jpg",
+      "genres": [
+        "Animación",
+        "Aventura",
+        "Comedia"
+      ]
+    },
+    {
+      "id": "511500",
+      "title": "A Monster's Calling",
+      "poster": "https://image.tmdb.org/t/p/w500/fwePaRsaSln4DTH4DVfJqLv209i.jpg",
+      "genres": [
+        "Animación",
+        "Comedia",
+        "Fantasía"
+      ],
+      "description": ""
     }
   ],
   "edges": [
@@ -424,6 +498,66 @@
       "source": "264660",
       "target": "404214",
       "label": "Aborda los dilemas éticos y los límites de la fusión entre la conciencia humana y la inteligencia artificial."
+    },
+    {
+      "id": "e-425-950",
+      "source": "425",
+      "target": "950",
+      "label": "Es la secuela directa que continúa las divertidas peripecias de Manny, Sid y Diego enfrentando un gran deshielo."
+    },
+    {
+      "id": "e-425-953",
+      "source": "425",
+      "target": "953",
+      "label": "Comparte el mismo estilo de comedia animada familiar con un grupo de animales carismáticos en situaciones cómicas."
+    },
+    {
+      "id": "e-425-12",
+      "source": "425",
+      "target": "12",
+      "label": "Mantiene el tono de aventura animada entrañable con un viaje dinámico y personajes inolvidables."
+    },
+    {
+      "id": "e-1084244-127380",
+      "source": "1084244",
+      "target": "127380",
+      "label": "Comparte la entrañable narrativa de Pixar, reuniendo a personajes queridos en una aventura familiar llena de humor y emoción."
+    },
+    {
+      "id": "e-1084244-9806",
+      "source": "1084244",
+      "target": "9806",
+      "label": "Mantiene el sello de calidad de Pixar con una dinámica familiar perfecta, acción vibrante y un gran sentido del humor."
+    },
+    {
+      "id": "e-1084244-14160",
+      "source": "1084244",
+      "target": "14160",
+      "label": "Ofrece esa mezcla única de Pixar de comedia entrañable, personajes inolvidables y una profunda carga emocional."
+    },
+    {
+      "id": "e-9502-1087192",
+      "source": "9502",
+      "target": "1087192",
+      "label": "Comparte una historia de superación personal con un protagonista improbable que se convierte en héroe en un mundo fantástico."
+    },
+    {
+      "id": "e-9502-417859",
+      "source": "9502",
+      "target": "417859",
+      "label": "Mantiene el mismo estilo de animación vibrante, acción desenfadada y un fuerte componente de comedia y carisma."
+    },
+    {
+      "id": "e-9502-49519",
+      "source": "9502",
+      "target": "49519",
+      "label": "Ofrece una comedia familiar llena de acción, aventuras prehistóricas y personajes entrañables con dinámica de grupo."
+    },
+    {
+      "id": "e-1084244-511500",
+      "source": "1084244",
+      "target": "511500",
+      "label": "Mantiene la entrañable dinámica de personajes carismáticos y el humor tierno característico de las grandes producciones de animación familiar."
     }
   ]
 }

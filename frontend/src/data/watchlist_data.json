@@ -8,7 +8,7 @@
       "Acción",
       "Suspenso"
     ],
-    "status": "completed"
+    "status": "pending"
   },
   {
     "id": "264660",
@@ -19,7 +19,7 @@
       "Drama",
       "Misterio"
     ],
-    "status": "completed"
+    "status": "pending"
   },
   {
     "id": "1084244",
@@ -30,6 +30,6 @@
       "Familia",
       "Comedia"
     ],
-    "status": "pending"
+    "status": "completed"
   }
 ]

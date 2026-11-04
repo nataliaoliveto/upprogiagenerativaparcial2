@@ -40,7 +40,12 @@ const WATCHLIST_FILE_PATH = path.join(
   "watchlist_data.json",
 );
 
-// Herramienta 1: Leer el grafo
+/**
+ * Lee y valida la estructura del grafo persistido.
+ *
+ * @returns El grafo con sus nodos y aristas.
+ * @throws {Error} Si el archivo no se puede leer, no contiene JSON válido o no tiene las colecciones `nodes` y `edges`.
+ */
 export async function readGraph(): Promise<GraphData> {
   try {
     const fileContent = await fs.readFile(DATA_FILE_PATH, "utf-8");
@@ -64,18 +69,30 @@ export async function readGraph(): Promise<GraphData> {
   }
 }
 
-// Herramienta 2: Consultar TMDB
+/**
+ * Busca una película por título en la API de TMDB y adapta el primer resultado.
+ *
+ * @param title Título de búsqueda; debe contener texto y no superar 200 caracteres.
+ * @returns La primera película encontrada, o `null` cuando TMDB no devuelve resultados.
+ * @throws {Error} Si el título está vacío o supera el límite permitido.
+ * @throws {Error} Si la petición a TMDB falla o devuelve una respuesta no exitosa.
+ */
 export async function searchTmdb(
   title: string,
 ): Promise<TmdbMovieResult | null> {
   if (!title || title.trim() === "") {
     throw new Error("El título de la película no puede estar vacío.");
   }
+  if (title.trim().length > 200) {
+    throw new Error("El título de la película excede el límite permitido.");
+  }
 
   const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title.trim())}&language=es-ES&api_key=${TMDB_API_KEY}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(10_000),
+    });
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
     }
@@ -94,13 +111,20 @@ export async function searchTmdb(
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
         : "",
     };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Error searching TMDB: ${message}`);
+  } catch {
+    throw new Error("Error al consultar TMDB. Intenta de nuevo.");
   }
 }
 
-// Herramienta 3: Agregar al Grafo (Versión Batching)
+/**
+ * Añade películas al grafo y, cuando se proporciona origen y motivo, crea también sus aristas.
+ *
+ * Los nodos y las aristas con identificadores existentes se conservan sin duplicarse.
+ *
+ * @param movies Películas a agregar, con campos opcionales de origen y motivo para crear conexiones.
+ * @returns Un mensaje con la cantidad de películas procesadas.
+ * @throws {Error} Si la lista está vacía o si falla la lectura o escritura del grafo.
+ */
 export async function addToGraph(movies: MovieBatchInput[]): Promise<string> {
   if (!Array.isArray(movies) || movies.length === 0) {
     throw new Error("La lista de películas a agregar no puede estar vacía.");
@@ -141,6 +165,14 @@ export async function addToGraph(movies: MovieBatchInput[]): Promise<string> {
   }
 }
 
+/**
+ * Agrega recomendaciones como nodos conectados a una película de origen existente.
+ *
+ * @param sourceId Identificador del nodo del que partirán las conexiones.
+ * @param recommendations Recomendaciones que se agregarán como nodos y aristas.
+ * @returns El mensaje devuelto por {@link addToGraph}.
+ * @throws {Error} Si el identificador de origen está vacío, no existe en el grafo, la lista está vacía o falla una operación de grafo.
+ */
 export async function addRecommendationsToGraph(
   sourceId: string,
   recommendations: Array<Omit<MovieBatchInput, "sourceId">>,
@@ -165,7 +197,19 @@ export async function addRecommendationsToGraph(
   );
 }
 
-// Herramienta 4: Eliminar del Grafo (Con Borrado en Cascada)
+/**
+ * Elimina una película y las recomendaciones que salen directamente de ella.
+ *
+ * @remarks
+ * La operación funciona como quitar una ficha principal de un tablero y, junto con ella,
+ * retirar las fichas recomendadas que dependen directamente de esa ficha. Después elimina
+ * todas las conexiones que tocan cualquiera de las fichas retiradas; las demás fichas y
+ * conexiones permanecen intactas. La cascada se limita a los hijos directos.
+ *
+ * @param movieId Identificador del nodo que se eliminará junto con sus hijos directos.
+ * @returns Un mensaje de éxito o uno que indica que el nodo no se encontró.
+ * @throws {Error} Si el identificador está vacío o si falla la lectura o escritura del grafo.
+ */
 export async function removeFromGraph(movieId: string): Promise<string> {
   if (!movieId || movieId.trim() === "") {
     throw new Error("El ID de la película a eliminar es obligatorio.");
@@ -204,7 +248,18 @@ export async function removeFromGraph(movieId: string): Promise<string> {
   }
 }
 
-// Herramienta 5: Limpiar Recomendaciones (Deja el padre, borra los hijos)
+/**
+ * Elimina las recomendaciones directas de una película, conservando el nodo de origen.
+ *
+ * @remarks
+ * Es como retirar del tablero las fichas recomendadas que apuntan desde una película,
+ * dejando la ficha de origen en su sitio. También se quita cualquier conexión asociada
+ * a las fichas retiradas; el resto del grafo no cambia.
+ *
+ * @param movieId Identificador del nodo cuyas recomendaciones se eliminarán.
+ * @returns Un mensaje de éxito o uno que indica que no había recomendaciones para borrar.
+ * @throws {Error} Si el identificador está vacío o si falla la lectura o escritura del grafo.
+ */
 export async function clearRecommendations(movieId: string): Promise<string> {
   if (!movieId || movieId.trim() === "") {
     throw new Error("El ID de la película original es obligatorio.");
@@ -239,7 +294,12 @@ export async function clearRecommendations(movieId: string): Promise<string> {
   }
 }
 
-// Herramienta 6: Leer las favoritas para contextualizar sugerencias
+/**
+ * Lee las películas de la lista de favoritas desde su archivo persistido.
+ *
+ * @returns Las favoritas guardadas; devuelve una lista vacía si el archivo no existe o está vacío.
+ * @throws {Error} Si el archivo contiene JSON inválido o no se puede leer por otro motivo.
+ */
 export async function readWatchlist(): Promise<WatchlistItem[]> {
   try {
     const content = await fs.readFile(WATCHLIST_FILE_PATH, "utf-8");

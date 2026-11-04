@@ -7,6 +7,8 @@ interface InputBarProps {
   onSearch: (query: string) => void;
 }
 
+const MAX_QUERY_LENGTH = 4_000;
+
 const SearchIcon = () => (
   <svg
     aria-hidden="true"
@@ -45,7 +47,7 @@ export const InputBar = ({
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const search = query.trim();
-    if (!search || isLoading) return;
+    if (!search || search.length > MAX_QUERY_LENGTH || isLoading) return;
 
     onSearch(search);
     setIsLoading(true);
@@ -115,6 +117,7 @@ export const InputBar = ({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            maxLength={MAX_QUERY_LENGTH}
             placeholder="Ej: Recomendar a partir de Matrix..."
             aria-label="Buscar recomendaciones de películas"
             disabled={isLoading}
